@@ -1,0 +1,11 @@
+numpy
+pandas
+seaborn
+torch
+imblearn
+boto3
+scikit-learn
+matplotlib
+awswrangler
+networkx
+plotly
