@@ -104,27 +104,31 @@ def measure_similarity(original_df, synthetic_df, features, categorical_features
     
     return distances
 
+use_cases = ['print','telesales','webinar']
+for use_case in use_cases:
+    df = pd.read_parquet('data/prefiltered/customer_journey/{use_case}_all_events_neural_ode_raw.parquet')
+    all_synthetic_data = pd.read_parquet('data/prefiltered/customer_journey/synthetic_selected_customers_events_{use_case}.parquet')
+    all_synthetic_data.rename(columns={'event_type': 'TYPE'}, inplace=True)
 
-# Example usage
-df = pd.read_parquet('data/prefiltered/customer_journey/{use_case}_all_events_neural_ode_raw.parquet')
-all_synthetic_data = pd.read_parquet('data/prefiltered/customer_journey/synthetic_selected_customers_events_{use_case}.parquet')
-all_synthetic_data.rename(columns={'event_type': 'TYPE'}, inplace=True)
+    all_synthetic_data['date'] = pd.to_datetime(all_synthetic_data['event_time'])
+    df['date'] = pd.to_datetime(df['date'])
 
-all_synthetic_data['date'] = pd.to_datetime(all_synthetic_data['event_time'])
-df['date'] = pd.to_datetime(df['date'])
+    features_to_compare = ['date', 'amount_net']
+    categorical_features_to_compare = ['TYPE']
 
-features_to_compare = ['date', 'amount_net']
-categorical_features_to_compare = ['TYPE']
-
-# Wasserstein
-similarity_distances = measure_similarity(df, all_synthetic_data, features_to_compare, categorical_features_to_compare)
-print(similarity_distances)
+    # Wasserstein
+    similarity_distances = measure_similarity(df, all_synthetic_data, features_to_compare, categorical_features_to_compare)
+    print ("Wasserstein")
+    print(use_case)
+    print(similarity_distances)
 
 
-# JSD
-numerical_features_to_compare = ['amount_net']
-categorical_features_to_compare = ['TYPE']
+    # JSD
+    numerical_features_to_compare = ['amount_net']
+    categorical_features_to_compare = ['TYPE']
 
-# Assuming `df` is the original dataframe and `all_synthetic_data` is the synthetic dataframe
-jsd_distances = measure_jsd_similarity(df, all_synthetic_data, numerical_features_to_compare, categorical_features_to_compare)
-print(jsd_distances)
+    # Assuming `df` is the original dataframe and `all_synthetic_data` is the synthetic dataframe
+    jsd_distances = measure_jsd_similarity(df, all_synthetic_data, numerical_features_to_compare, categorical_features_to_compare)
+    print ("JSD")
+    print(use_case)
+    print(jsd_distances)
